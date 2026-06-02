@@ -10,6 +10,8 @@
     portfolio: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTPdCvxtTw-U_wwtEYwen3WQYlbfoCnkKcJYgskKlgKC9PcPR9SQ5dp3nN6MmTaIviL3X9PV3GkQk7R/pub?gid=1822842033&single=true&output=csv'
   };
   var state = { calendarRows: [], calendarDate: new Date(), parentViewport: null };
+  var lastSentHeight = 0;
+  var heightTimer = null;
   var ids = ['intro', 'notice', 'calendar', 'process', 'price', 'portfolio', 'form'];
 
   function el(id) { return document.getElementById(id); }
@@ -151,7 +153,7 @@
       html += '<div class="cal-cell' + (day.getMonth() !== m ? ' is-muted' : '') + colorClass + '"><span class="cal-day">' + day.getDate() + '</span>' + events.map(function (ev) { return '<span class="cal-event ' + esc((ev.color || '').toLowerCase()) + '">' + esc(ev.label) + '</span>'; }).join('') + '</div>';
     }
     el('calendarContent').innerHTML = html;
-    sendHeight();
+    requestHeight(80);
   }
 
   function renderProcess(rows) {
@@ -244,9 +246,12 @@
       if (data.type === 'BONGRAE_NAV_TO') go(data.sectionId);
       if (data.type === 'BONGRAE_PARENT_VIEWPORT') state.parentViewport = data;
     });
-    if ('ResizeObserver' in window) new ResizeObserver(sendHeight).observe(document.body);
-    window.addEventListener('load', sendHeight);
-    window.addEventListener('resize', sendHeight);
+    window.addEventListener('load', function () { sendHeight(true); });
+    window.addEventListener('resize', function () { requestHeight(80); });
+    document.addEventListener('load', function (event) {
+      var tag = event.target && event.target.tagName ? event.target.tagName.toLowerCase() : '';
+      if (tag === 'img' || tag === 'iframe') requestHeight(120);
+    }, true);
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) { if (entry.isIntersecting) post({ type: 'BONGRAE_ACTIVE', sectionId: entry.target.id }); });
     }, { threshold: 0.3 });
@@ -292,14 +297,31 @@
     window.parent.postMessage(data, '*');
   }
 
-  function sendHeight() {
-    post({ type: 'BONGRAE_HEIGHT', height: Math.max(document.documentElement.scrollHeight, document.body.scrollHeight) });
+  function measureHeight() {
+    var app = el('app');
+    var main = document.querySelector('main');
+    var appHeight = app ? Math.ceil(app.scrollHeight || app.getBoundingClientRect().height || 0) : 0;
+    var mainHeight = main ? Math.ceil((main.offsetTop || 0) + (main.scrollHeight || main.getBoundingClientRect().height || 0)) : 0;
+    return Math.max(appHeight, mainHeight, 720);
+  }
+
+  function requestHeight(delay) {
+    clearTimeout(heightTimer);
+    heightTimer = setTimeout(sendHeight, delay || 0);
+  }
+
+  function sendHeight(force) {
+    var height = measureHeight();
+    if (!height) return;
+    if (!force && lastSentHeight && Math.abs(height - lastSentHeight) < 20) return;
+    lastSentHeight = height;
+    post({ type: 'BONGRAE_HEIGHT', height: height });
   }
 
   function hideLoader() {
     var loader = document.querySelector('[data-loader]');
     if (loader) loader.classList.add('is-hidden');
-    sendHeight();
+    requestHeight(80);
   }
 
   function boot() {
@@ -320,7 +342,7 @@
       renderTypes(price);
       renderPortfolio(portfolio);
       hideLoader();
-      [80, 260, 700, 1400].forEach(function (ms) { setTimeout(sendHeight, ms); });
+      [120, 360, 900, 1600].forEach(function (ms) { setTimeout(function () { sendHeight(true); }, ms); });
     });
   }
 

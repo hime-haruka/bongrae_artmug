@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="format-detection" content="telephone=no">
+  <title>봉래 포트폴리오</title>
+  <link rel="stylesheet" href="./iframe.css">
+</head>
+<body>
+  <div id="app" class="page">
+    <div class="loader" data-loader>
+      <div class="loader__mark"></div>
+      <p>포트폴리오를 불러오는 중입니다</p>
+    </div>
+    <main>
+      <section class="section intro" id="intro" data-section>
+        <div class="section__head"><span>01</span><h2>작가 소개</h2></div>
+        <div id="introContent" class="intro__card skeleton-card"></div>
+      </section>
+      <section class="section" id="notice" data-section>
+        <div class="section__head"><span>02</span><h2>작업 전 안내</h2></div>
+        <div class="notice-callout">문의 전 꼭 확인해주세요!</div>
+        <div id="noticeContent" class="notice-grid"></div>
+      </section>
+      <section class="section" id="calendar" data-section>
+        <div class="section__head"><span>03</span><h2>작업 캘린더</h2></div>
+        <div class="calendar-wrap">
+          <div class="calendar-head"><button type="button" data-cal-prev>‹</button><strong data-cal-title></strong><button type="button" data-cal-next>›</button></div>
+          <div id="calendarContent" class="calendar"></div>
+          <div class="calendar-legend"><span><i class="dot working"></i>작업중</span><span><i class="dot off"></i>휴무</span></div>
+        </div>
+      </section>
+      <section class="section" id="process" data-section>
+        <div class="section__head"><span>04</span><h2>작업 프로세스</h2></div>
+        <ol id="processContent" class="process-list"></ol>
+      </section>
+      <section class="section" id="price" data-section>
+        <div class="section__head"><span>05</span><h2>가격 안내</h2></div>
+        <div id="priceContent" class="price-area"></div>
+      </section>
+      <section class="section" id="portfolio" data-section>
+        <div class="section__head"><span>06</span><h2>포트폴리오</h2></div>
+        <p class="portfolio-note">※ 이미지를 클릭하면 크게 보실 수 있습니다.</p>
+        <div id="portfolioContent" class="portfolio-area"></div>
+      </section>
+      <section class="section" id="form" data-section>
+        <div class="section__head"><span>07</span><h2>신청 양식</h2></div>
+        <form class="request-form" id="requestForm">
+          <label><span>닉네임/활동명</span><input name="닉네임/활동명" type="text"></label>
+          <label><span>캐릭터 시트 및 해석</span><textarea name="캐릭터 시트 및 해석" placeholder="아트머그 문의 시 시트 이미지를 함께 첨부해주세요."></textarea></label>
+          <fieldset><legend>신청 타입</legend><div id="typeOptions" class="option-list"></div></fieldset>
+          <fieldset><legend>사용 목적</legend><div class="option-list"><label><input type="radio" name="사용 목적" value="비상업용">비상업용</label><label><input type="radio" name="사용 목적" value="방송용">방송용</label><label><input type="radio" name="사용 목적" value="상업용">상업용</label><label><input type="radio" name="사용 목적" value="기타">기타</label></div></fieldset>
+          <div class="form-row--half"><label><span>이미지 사이즈</span><input name="이미지 사이즈" type="text" placeholder="기본 사이즈 3000~5000px 300dpi"></label><label><span>수령희망 날짜</span><input name="수령희망 날짜" type="date"></label></div>
+          <label><span>원하시는 느낌 및 색감</span><textarea name="원하시는 느낌 및 색감" placeholder="글, 그림 등 자유롭게 설명 해주세요. 자세하게 설명할수록 좋은 그림이 됩니다."></textarea></label>
+          <div class="form-actions"><button type="button" id="copyForm">양식 복사</button><button type="reset">Reset</button></div>
+        </form>
+      </section>
+    </main>
+    <div class="toast" id="toast">복사되었습니다</div>
+  </div>
+  <script src="./iframe.js"></script>
+</body>
+</html>

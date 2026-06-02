@@ -66,12 +66,12 @@
   function setHeight(value) {
     var iframe = frame();
     var next = Math.max(720, Math.ceil(Number(value) || 0) + 24);
-    if (!iframe || !next || Math.abs(next - lastHeight) < 18) return;
+    if (!iframe || !next || Math.abs(next - lastHeight) < 50) return;
     iframe.style.width = '100%';
     iframe.style.maxWidth = '1180px';
     iframe.style.margin = '0 auto';
     iframe.style.height = next + 'px';
-    iframe.style.minHeight = next + 'px';
+    iframe.style.minHeight = '720px';
     iframe.style.border = '0';
     iframe.style.display = 'block';
     iframe.style.overflow = 'hidden';
