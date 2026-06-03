@@ -144,15 +144,71 @@
     var m = target.getMonth();
     var first = new Date(y, m, 1);
     var start = new Date(y, m, 1 - first.getDay());
+    var monthStart = new Date(y, m, 1);
+    var monthEnd = new Date(y, m + 1, 0);
+
+    function eventColor(row) {
+      return String(row.color || '').toLowerCase();
+    }
+
+    function overlapsMonth(row) {
+      var s = dateOnly(row.date_s);
+      var e = dateOnly(row.date_e || row.date_s);
+      return e.getTime() >= monthStart.getTime() && s.getTime() <= monthEnd.getTime();
+    }
+
+    function formatDateLabel(row) {
+      var s = dateOnly(row.date_s);
+      var e = dateOnly(row.date_e || row.date_s);
+      var sameDate = sameDay(s, e);
+      var sameMonth = s.getMonth() === e.getMonth();
+
+      if (sameDate) return '[ ' + (s.getMonth() + 1) + '/' + s.getDate() + ' ]';
+      if (sameMonth) return '[ ' + (s.getMonth() + 1) + '/' + s.getDate() + ' ~ ' + (e.getMonth() + 1) + '/' + e.getDate() + ' ]';
+      return '[ ' + (s.getMonth() + 1) + '/' + s.getDate() + ' ~ ' + (e.getMonth() + 1) + '/' + e.getDate() + ' ]';
+    }
+
     document.querySelector('[data-cal-title]').textContent = y + '. ' + String(m + 1).padStart(2, '0');
-    var html = ['일', '월', '화', '수', '목', '금', '토'].map(function (d) { return '<div class="cal-cell cal-head-cell"><b>' + d + '</b></div>'; }).join('');
+
+    var calendarHtml = ['일', '월', '화', '수', '목', '금', '토'].map(function (d) {
+      return '<div class="cal-cell cal-head-cell"><b>' + d + '</b></div>';
+    }).join('');
+
     for (var i = 0; i < 42; i += 1) {
       var day = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
       var events = rows.filter(function (r) { return between(day, r.date_s, r.date_e); });
-      var colorClass = events.some(function (ev) { return String(ev.color || '').toLowerCase() === 'off'; }) ? ' is-off' : (events.length ? ' is-working' : '');
-      html += '<div class="cal-cell' + (day.getMonth() !== m ? ' is-muted' : '') + colorClass + '"><span class="cal-day">' + day.getDate() + '</span>' + events.map(function (ev) { return '<span class="cal-event ' + esc((ev.color || '').toLowerCase()) + '">' + esc(ev.label) + '</span>'; }).join('') + '</div>';
+      var hasOff = events.some(function (ev) { return eventColor(ev) === 'off'; });
+      var colorClass = hasOff ? ' is-off' : (events.length ? ' is-working' : '');
+      var dot = events.length ? '<span class="cal-event-dot' + (hasOff ? ' off' : '') + '"></span>' : '';
+
+      calendarHtml += '<div class="cal-cell' + (day.getMonth() !== m ? ' is-muted' : '') + colorClass + '">' +
+        '<span class="cal-day">' + day.getDate() + '</span>' +
+        dot +
+        '</div>';
     }
-    el('calendarContent').innerHTML = html;
+
+    var monthRows = rows.filter(overlapsMonth).sort(function (a, b) {
+      return dateOnly(a.date_s).getTime() - dateOnly(b.date_s).getTime() || text(a.label).localeCompare(text(b.label));
+    });
+
+    var scheduleHtml = monthRows.length ? monthRows.map(function (row) {
+      var color = eventColor(row);
+      return '<article class="schedule-item' + (color === 'off' ? ' is-off' : '') + '">' +
+        '<span class="schedule-date">' + esc(formatDateLabel(row)) + '</span>' +
+        '<span class="schedule-label">' + esc(row.label || '일정') + '</span>' +
+        '</article>';
+    }).join('') : '<div class="calendar-schedule__empty">이번 달 등록된 일정이 없습니다.</div>';
+
+    el('calendarContent').className = 'calendar-layout';
+    el('calendarContent').innerHTML =
+      '<div class="calendar-board">' +
+        '<div class="calendar-panel"><div class="calendar">' + calendarHtml + '</div></div>' +
+        '<aside class="calendar-schedule">' +
+          '<h3 class="calendar-schedule__title">이달의 일정</h3>' +
+          '<div class="calendar-schedule__list">' + scheduleHtml + '</div>' +
+        '</aside>' +
+      '</div>';
+
     requestHeight(80);
   }
 
@@ -227,6 +283,89 @@
     var opts = rows.filter(function (r) { return r.category && r.option; }).map(function (r) { return r.category + ' · ' + r.option; }).filter(function (v) { if (seen[v]) return false; seen[v] = true; return true; });
     el('typeOptions').innerHTML = opts.map(function (v) { return '<label><input type="checkbox" name="신청 타입" value="' + esc(v) + '"><span>' + esc(v) + '</span></label>'; }).join('') || '<p class="empty">가격 데이터가 필요합니다.</p>';
   }
+
+
+  function createDecorLayer() {
+    var app = el('app');
+    if (!app || app.querySelector('.neon-decor-layer')) return;
+
+    var layer = document.createElement('div');
+    layer.className = 'neon-decor-layer';
+    layer.setAttribute('aria-hidden', 'true');
+
+    var decorItems = [
+      /* left edge dot grids */
+      { type: 'dotgrid', x: 1.5, y: 8, w: 104, h: 188, o: 0.46, r: -2 },
+      { type: 'dotgrid', x: 2.5, y: 38, w: 92, h: 170, o: 0.30, r: 1 },
+      { type: 'dotgrid', x: 8, y: 82, w: 116, h: 168, o: 0.26, r: 3 },
+
+      /* right edge dot grids */
+      { type: 'dotgrid', x: 88, y: 10, w: 132, h: 212, o: 0.40, r: 1 },
+      { type: 'dotgrid', x: 91, y: 46, w: 104, h: 176, o: 0.30, r: -2 },
+      { type: 'dotgrid', x: 76, y: 76, w: 138, h: 206, o: 0.28, r: 0 },
+
+      /* subtle center/background dot grids */
+      { type: 'dotgrid', x: 50, y: 30, w: 86, h: 132, o: 0.16, r: -4 },
+      { type: 'dotgrid', x: 37, y: 90, w: 92, h: 142, o: 0.16, r: 2 },
+
+      /* large background orbs, mostly outside viewport edges */
+      { type: 'orb', x: 76, y: -8, size: 380, o: 0.48, r: 0 },
+      { type: 'orb', x: -14, y: 54, size: 330, o: 0.36, r: 0 },
+      { type: 'orb', x: 88, y: 88, size: 250, o: 0.24, r: 0 },
+      { type: 'orb', x: -8, y: 6, size: 180, o: 0.18, r: 0 },
+      { type: 'orb', x: 94, y: 34, size: 190, o: 0.20, r: 0 },
+
+      /* rings on margins / empty zones */
+      { type: 'ring', x: 82, y: 7, size: 62, o: 0.44, r: 0 },
+      { type: 'ring', x: 4, y: 29, size: 42, o: 0.34, r: 0 },
+      { type: 'ring', x: 61, y: 12, size: 34, o: 0.26, r: 0 },
+      { type: 'ring', x: 93, y: 63, size: 30, o: 0.24, r: 0 },
+      { type: 'ring', x: 13, y: 88, size: 28, o: 0.22, r: 0 },
+
+      /* sparkles: moved away from section titles */
+      { type: 'sparkle', x: 30, y: 6, size: 30, o: 0.50, r: 8 },
+      { type: 'sparkle', x: 93, y: 21, size: 28, o: 0.42, r: -8 },
+      { type: 'sparkle', x: 86, y: 84, size: 24, o: 0.34, r: 12 },
+      { type: 'sparkle', x: 6, y: 50, size: 22, o: 0.30, r: -14 },
+      { type: 'sparkle', x: 66, y: 72, size: 22, o: 0.28, r: 4 },
+      { type: 'sparkle', x: 96, y: 6, size: 20, o: 0.28, r: 10 },
+      { type: 'sparkle', x: 18, y: 70, size: 18, o: 0.22, r: -6 },
+
+      /* small glowing dots */
+      { type: 'small-dot', x: 92, y: 9, size: 10, o: 0.58, r: 0 },
+      { type: 'small-dot pink', x: 6, y: 66, size: 9, o: 0.50, r: 0 },
+      { type: 'small-dot', x: 95, y: 58, size: 7, o: 0.46, r: 0 },
+      { type: 'small-dot pink', x: 74, y: 18, size: 8, o: 0.36, r: 0 },
+      { type: 'small-dot', x: 20, y: 78, size: 6, o: 0.34, r: 0 },
+      { type: 'small-dot pink', x: 48, y: 10, size: 6, o: 0.30, r: 0 },
+      { type: 'small-dot', x: 12, y: 23, size: 5, o: 0.32, r: 0 },
+      { type: 'small-dot pink', x: 89, y: 72, size: 6, o: 0.30, r: 0 },
+      { type: 'small-dot', x: 55, y: 86, size: 5, o: 0.24, r: 0 }
+    ];
+
+    decorItems.forEach(function (item, index) {
+      var node = document.createElement('span');
+      var classes = item.type.split(' ');
+      node.className = 'neon-decor neon-decor--' + classes[0] + (classes[1] ? ' is-' + classes[1] : '');
+      node.style.left = item.x + '%';
+      node.style.top = item.y + '%';
+      node.style.setProperty('--decor-opacity', item.o);
+      node.style.setProperty('--decor-rotate', (item.r || 0) + 'deg');
+      node.style.setProperty('--decor-duration', (8 + (index % 5) * 1.4) + 's');
+      node.style.setProperty('--decor-delay', (-index * 0.45) + 's');
+      node.style.setProperty('--decor-move-x', ((index % 2 ? -1 : 1) * (6 + index % 4)) + 'px');
+      node.style.setProperty('--decor-move-y', (-8 - (index % 5) * 2) + 'px');
+
+      if (item.size) node.style.setProperty('--decor-size', item.size + 'px');
+      if (item.w) node.style.setProperty('--decor-w', item.w + 'px');
+      if (item.h) node.style.setProperty('--decor-h', item.h + 'px');
+
+      layer.appendChild(node);
+    });
+
+    app.insertBefore(layer, app.firstChild);
+  }
+
 
   function bindEvents() {
     document.addEventListener('click', function (e) {
@@ -325,6 +464,7 @@
   }
 
   function boot() {
+    createDecorLayer();
     bindEvents();
     post({ type: 'BONGRAE_READY' });
     Promise.allSettled([fetchCSV(CSV.intro), fetchCSV(CSV.notice), fetchCSV(CSV.calendar), fetchCSV(CSV.process), fetchCSV(CSV.price), fetchCSV(CSV.portfolio)]).then(function (res) {
