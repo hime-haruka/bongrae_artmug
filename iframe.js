@@ -121,7 +121,7 @@
     var r = rows[0] || {};
     var badges = text(r.badge).split(/\s+/).filter(Boolean).map(function (b) { return '<span class="badge">' + esc(b) + '</span>'; }).join('');
     el('introContent').classList.remove('skeleton-card');
-    el('introContent').innerHTML = rows.length ? '<img class="intro__image" src="' + esc(driveImage(r.image)) + '" alt="' + esc(r.name) + ' 프로필" onerror="this.style.display=\'none\'"><div><h3 class="intro__name">' + esc(r.name) + '</h3><p class="intro__sub">@' + esc(r.sub) + '</p><p class="intro__desc">' + esc(r.desc) + '</p><div class="badges">' + badges + '</div></div>' : empty('작가 소개');
+    el('introContent').innerHTML = rows.length ? '<img class="intro__image" src="' + esc(driveImage(r.image)) + '" alt="' + esc(r.name) + ' 프로필" onerror="this.style.display=\'none\'"><div><h3 class="intro__name">' + esc(r.name) + '</h3><p class="intro__sub">' + esc(r.sub) + '</p><p class="intro__desc">' + esc(r.desc) + '</p><div class="badges">' + badges + '</div></div>' : empty('작가 소개');
   }
 
   function renderNotice(rows) {
