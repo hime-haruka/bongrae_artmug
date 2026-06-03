@@ -280,20 +280,25 @@
   }
 
   function renderTypes(rows) {
-    var opts = [];
-    rows.forEach(function (r) {
+    var seen = {};
+    var opts = rows.filter(function (r) {
+      return text(r.category) && text(r.option);
+    }).sort(function (a, b) {
+      return num(a.c_order) - num(b.c_order);
+    }).map(function (r) {
       var category = text(r.category);
       var option = text(r.option);
-      if (!option) return;
-      if (category === '캐릭터 일러스트') {
-        var group = text(r.group);
-        if (group && group !== '비상업용') return;
-      }
-      opts.push({category: category, option: option});
-    });
+      var key = category + '||' + option;
+      if (seen[key]) return null;
+      seen[key] = true;
+      return {
+        value: category === option ? category : category + ' ' + option,
+        label: category === option ? category : category + ' ' + option
+      };
+    }).filter(Boolean);
 
-    el('typeOptions').innerHTML = opts.map(function (v) {
-      return '<label><input type="checkbox" name="신청 타입" value="' + esc(v.category + ' ' + v.option) + '"><span>' + esc(v.option) + '</span></label>';
+    el('typeOptions').innerHTML = opts.map(function (item) {
+      return '<label><input type="checkbox" name="신청 타입" value="' + esc(item.value) + '"><span>' + esc(item.label) + '</span></label>';
     }).join('') || '<p class="empty">가격 데이터가 필요합니다.</p>';
   }
 
