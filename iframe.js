@@ -292,8 +292,8 @@
       if (seen[key]) return null;
       seen[key] = true;
       return {
-        value: category === option ? category : category + ' ' + option,
-        label: category === option ? category : category + ' ' + option
+        value: category === option ? category : category + ' ⦁ ' + option,
+        label: category === option ? category : category + ' ⦁ ' + option
       };
     }).filter(Boolean);
 
