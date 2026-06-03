@@ -247,7 +247,8 @@
         var showTitle = title && title !== '기타' && title !== cat;
         return '<section class="price-group' + (!showTitle ? ' is-simple' : '') + '">' + (showTitle ? '<h4>' + esc(title) + '</h4>' : '') + (desc ? '<p>' + esc(desc.desc) + '</p>' : '') + '<div class="price-items">' + groupRows.map(function (r) {
           var option = text(r.option) || '옵션';
-          return '<div class="price-card"><div><span>' + esc(option) + '</span></div><strong>' + priceText(r.price) + '</strong></div>';
+          var unit = text(r.unit);
+          return '<div class="price-card"><div><span>' + esc(option) + (unit ? ' <em class="price-unit">(' + esc(unit) + ')</em>' : '') + '</span></div><strong>' + priceText(r.price) + '</strong></div>';
         }).join('') + '</div></section>';
       }).join('') + '</div></article>';
     }).join('');
@@ -280,7 +281,12 @@
 
   function renderTypes(rows) {
     var seen = {};
-    var opts = rows.filter(function (r) { return r.category && r.option; }).map(function (r) { return r.category + ' · ' + r.option; }).filter(function (v) { if (seen[v]) return false; seen[v] = true; return true; });
+    var opts = rows.filter(function (r) { return r.category && r.option; }).map(function (r) {
+      var parts = [r.category];
+      if (r.group) parts.push(r.group);
+      parts.push(r.option);
+      return parts.join(' · ');
+    }).filter(function (v) { if (seen[v]) return false; seen[v] = true; return true; });
     el('typeOptions').innerHTML = opts.map(function (v) { return '<label><input type="checkbox" name="신청 타입" value="' + esc(v) + '"><span>' + esc(v) + '</span></label>'; }).join('') || '<p class="empty">가격 데이터가 필요합니다.</p>';
   }
 
