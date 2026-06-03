@@ -281,12 +281,15 @@
 
   function renderTypes(rows) {
     var seen = {};
-    var opts = rows.filter(function (r) { return r.category && r.option; }).map(function (r) {
-      var parts = [r.category];
-      if (r.group) parts.push(r.group);
-      parts.push(r.option);
-      return parts.join(' · ');
-    }).filter(function (v) { if (seen[v]) return false; seen[v] = true; return true; });
+    var opts = rows.filter(function (r) {
+      return text(r.category) === '캐릭터 일러스트' && text(r.option);
+    }).map(function (r) {
+      return text(r.option);
+    }).filter(function (v) {
+      if (seen[v]) return false;
+      seen[v] = true;
+      return true;
+    });
     el('typeOptions').innerHTML = opts.map(function (v) { return '<label><input type="checkbox" name="신청 타입" value="' + esc(v) + '"><span>' + esc(v) + '</span></label>'; }).join('') || '<p class="empty">가격 데이터가 필요합니다.</p>';
   }
 
