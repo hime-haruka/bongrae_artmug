@@ -1163,8 +1163,6 @@ main {
 /* ==============================
    Calendar layout fix + neon boost
    ============================== */
-
-/* iframe 환경용: fixed 없이 body/page 내부에서만 네온 배경 강화 */
 body {
   background:
     radial-gradient(circle at 74% -8%, rgba(238, 76, 184, 0.38), transparent 23rem),
@@ -1195,7 +1193,6 @@ body {
     radial-gradient(circle, rgba(98, 53, 220, 0.34), rgba(226, 77, 177, 0.10) 62%, transparent 74%) !important;
 }
 
-/* 도트와 제목 사이 여백 */
 .notice-card h3,
 .price-category h3,
 .portfolio-category h3 {
@@ -1209,7 +1206,6 @@ body {
   box-shadow: 17px 0 0 rgba(255, 104, 200, 0.46) !important;
 }
 
-/* 캘린더 전체 박스 */
 .calendar-wrap {
   padding: 26px !important;
   overflow: hidden !important;
@@ -1268,7 +1264,6 @@ body {
   transform: translate(-65%, -50%) rotate(225deg) !important;
 }
 
-/* JS가 만드는 새 구조 */
 .calendar-board {
   display: grid !important;
   grid-template-columns: minmax(0, 1.42fr) minmax(280px, 0.88fr) !important;
@@ -1748,7 +1743,6 @@ body {
   opacity: var(--decor-opacity, 0.72);
 }
 
-/* 이달의 일정 날짜 앞 도트 제거 */
 .schedule-item::after {
   content: none !important;
   display: none !important;
@@ -1811,7 +1805,6 @@ body {
   opacity: var(--decor-opacity, 0.58) !important;
 }
 
-/* 제목 근처에 겹쳐 보이는 장식 완화 */
 .section__head + .notice-callout,
 .section__head + .intro__card,
 .section__head + .calendar-wrap,
@@ -1822,7 +1815,6 @@ body {
   z-index: 3 !important;
 }
 
-/* 기존 제목/본문 위로 올라온 장식 대비용 아주 약한 텍스트 보호 */
 .section__head h2,
 .notice-callout,
 .notice-card h3,
@@ -1832,8 +1824,6 @@ body {
     0 2px 12px rgba(4, 3, 10, 0.92),
     0 0 18px rgba(143, 84, 255, 0.16) !important;
 }
-
-/* 장식 밀도 보강용 배경 패턴: 글자 위가 아니라 페이지 바탕에서만 보임 */
 .page {
   background-image:
     radial-gradient(circle at 8% 18%, rgba(143, 84, 255, 0.12), transparent 18rem),
@@ -2016,3 +2006,7 @@ body {
     rgba(18, 11, 34, 0.88) !important;
 }
 
+.price-unit {
+  font-style: normal;
+  font-size: 18px;
+}
