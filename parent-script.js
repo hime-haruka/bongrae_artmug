@@ -1,7 +1,9 @@
 (function () {
   'use strict';
 
-  var FRAME_KEY = 'bongrae-portfolio';
+  var IFRAME_ORIGIN = 'https://hime-haruka.github.io';
+  var IFRAME_PATH = 'hime-haruka.github.io/bongrae_artmug';
+  var FRAME_KEY = 'bongrae_artmug';
   var STYLE_ID = 'bongrae-portfolio-parent-style';
   var NAV_ID = 'bongrae-portfolio-parent-nav';
   var MODAL_ID = 'bongrae-portfolio-image-modal';
@@ -18,13 +20,17 @@
   ];
 
   function frame() {
-    return document.querySelector('iframe[src*="' + FRAME_KEY + '"], section[name="am-root"] iframe, [name="am-root"] iframe');
+    return document.querySelector(
+      'section[name="am-root"] iframe[src*="' + IFRAME_PATH + '"], ' +
+      '[name="am-root"] iframe[src*="' + IFRAME_PATH + '"], ' +
+      'iframe[src*="' + IFRAME_PATH + '"], ' +
+      'iframe[src*="' + FRAME_KEY + '"], ' +
+      'section[name="am-root"] iframe, [name="am-root"] iframe'
+    );
   }
 
   function origin() {
-    var iframe = frame();
-    if (!iframe || !iframe.src) return '*';
-    try { return new URL(iframe.src, location.href).origin; } catch (e) { return '*'; }
+    return IFRAME_ORIGIN;
   }
 
   function scrollY() {
